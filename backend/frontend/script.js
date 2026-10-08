@@ -1,7 +1,9 @@
 const API_URL = "http://127.0.0.1:8000";
 
 
-// ================= SECTION NAVIGATION =================
+// ==================================================
+// SECTION NAVIGATION
+// ==================================================
 
 function showSection(sectionId) {
 
@@ -19,7 +21,9 @@ function showSection(sectionId) {
 }
 
 
-// ================= LOAD DASHBOARD =================
+// ==================================================
+// LOAD DASHBOARD
+// ==================================================
 
 async function loadDashboard() {
 
@@ -59,16 +63,25 @@ async function loadDashboard() {
 }
 
 
-// ================= ADD PATIENT =================
+// ==================================================
+// ADD PATIENT
+// ==================================================
 
 async function addPatient(event) {
 
     event.preventDefault();
 
-    const name = document.getElementById("patientName").value;
-    const age = document.getElementById("patientAge").value;
-    const gender = document.getElementById("patientGender").value;
-    const disease = document.getElementById("patientDisease").value;
+    const name =
+        document.getElementById("patientName").value;
+
+    const age =
+        document.getElementById("patientAge").value;
+
+    const gender =
+        document.getElementById("patientGender").value;
+
+    const disease =
+        document.getElementById("patientDisease").value;
 
     const params = new URLSearchParams({
         name: name,
@@ -86,9 +99,8 @@ async function addPatient(event) {
             }
         );
 
-        const data = await response.json();
-
-        const message = document.getElementById("patientMessage");
+        const message =
+            document.getElementById("patientMessage");
 
         if (response.ok) {
 
@@ -98,6 +110,7 @@ async function addPatient(event) {
             document.getElementById("patientForm").reset();
 
             loadPatients();
+
             loadDashboard();
 
         } else {
@@ -118,7 +131,9 @@ async function addPatient(event) {
 }
 
 
-// ================= LOAD PATIENTS =================
+// ==================================================
+// LOAD PATIENTS
+// ==================================================
 
 async function loadPatients() {
 
@@ -133,6 +148,10 @@ async function loadPatients() {
 
         const response =
             await fetch(API_URL + "/patients");
+
+        if (!response.ok) {
+            throw new Error("Patients request failed");
+        }
 
         const patients =
             await response.json();
@@ -221,29 +240,35 @@ async function loadPatients() {
 }
 
 
-// ================= EDIT PATIENT =================
+// ==================================================
+// EDIT PATIENT
+// ==================================================
 
 async function editPatient(patientId) {
 
-    const name = prompt("Enter patient name:");
+    const name =
+        prompt("Enter patient name:");
 
     if (name === null) {
         return;
     }
 
-    const age = prompt("Enter patient age:");
+    const age =
+        prompt("Enter patient age:");
 
     if (age === null) {
         return;
     }
 
-    const gender = prompt("Enter gender (Male/Female):");
+    const gender =
+        prompt("Enter gender (Male/Female):");
 
     if (gender === null) {
         return;
     }
 
-    const disease = prompt("Enter disease:");
+    const disease =
+        prompt("Enter disease:");
 
     if (disease === null) {
         return;
@@ -274,6 +299,7 @@ async function editPatient(patientId) {
             alert("✅ Patient updated successfully!");
 
             loadPatients();
+
             loadDashboard();
 
         } else {
@@ -292,12 +318,16 @@ async function editPatient(patientId) {
 }
 
 
-// ================= DELETE PATIENT =================
+// ==================================================
+// DELETE PATIENT
+// ==================================================
 
 async function deletePatient(patientId) {
 
     const confirmDelete =
-        confirm("Are you sure you want to delete this patient?");
+        confirm(
+            "Are you sure you want to delete this patient?"
+        );
 
     if (!confirmDelete) {
         return;
@@ -317,6 +347,7 @@ async function deletePatient(patientId) {
             alert("✅ Patient deleted successfully!");
 
             loadPatients();
+
             loadDashboard();
 
         } else {
@@ -335,7 +366,9 @@ async function deletePatient(patientId) {
 }
 
 
-// ================= ADD DOCTOR =================
+// ==================================================
+// ADD DOCTOR
+// ==================================================
 
 async function addDoctor(event) {
 
@@ -365,8 +398,6 @@ async function addDoctor(event) {
             }
         );
 
-        const data = await response.json();
-
         const message =
             document.getElementById("doctorMessage");
 
@@ -378,6 +409,7 @@ async function addDoctor(event) {
             document.getElementById("doctorForm").reset();
 
             loadDoctors();
+
             loadDashboard();
 
         } else {
@@ -398,7 +430,9 @@ async function addDoctor(event) {
 }
 
 
-// ================= LOAD DOCTORS =================
+// ==================================================
+// LOAD DOCTORS
+// ==================================================
 
 async function loadDoctors() {
 
@@ -413,6 +447,10 @@ async function loadDoctors() {
 
         const response =
             await fetch(API_URL + "/doctors");
+
+        if (!response.ok) {
+            throw new Error("Doctors request failed");
+        }
 
         const doctors =
             await response.json();
@@ -479,40 +517,183 @@ async function loadDoctors() {
 }
 
 
-// ================= START APPLICATION =================
+// ==================================================
+// CHATBOT - OPEN / CLOSE
+// ==================================================
 
-document.addEventListener("DOMContentLoaded", function() {
+function toggleChatbot() {
 
-    loadDashboard();
+    const chatbotBox =
+        document.getElementById("chatbotBox");
 
-    loadPatients();
+    if (!chatbotBox) {
+        return;
+    }
 
-    loadDoctors();
+    chatbotBox.classList.toggle("active");
+}
 
 
-    const patientForm =
-        document.getElementById("patientForm");
+// ==================================================
+// CHATBOT - SEND MESSAGE
+// ==================================================
 
-    if (patientForm) {
+async function sendChatMessage() {
 
-        patientForm.addEventListener(
-            "submit",
-            addPatient
-        );
+    const input =
+        document.getElementById("chatbotInput");
 
+    const messages =
+        document.getElementById("chatbotMessages");
+
+    if (!input || !messages) {
+        return;
+    }
+
+    const message =
+        input.value.trim();
+
+    if (message === "") {
+        return;
     }
 
 
-    const doctorForm =
-        document.getElementById("doctorForm");
+    // USER MESSAGE
 
-    if (doctorForm) {
+    const userMessage =
+        document.createElement("div");
 
-        doctorForm.addEventListener(
-            "submit",
-            addDoctor
+    userMessage.className =
+        "user-message";
+
+    userMessage.textContent =
+        message;
+
+    messages.appendChild(userMessage);
+
+
+    // CLEAR INPUT
+
+    input.value = "";
+
+
+    // SCROLL DOWN
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+
+    try {
+
+        const response = await fetch(
+            API_URL +
+            "/chatbot?message=" +
+            encodeURIComponent(message)
         );
 
-    }
 
-});
+        if (!response.ok) {
+            throw new Error("Chatbot request failed");
+        }
+
+
+        const data =
+            await response.json();
+
+
+        // BOT MESSAGE
+
+        const botMessage =
+            document.createElement("div");
+
+        botMessage.className =
+            "bot-message";
+
+        botMessage.textContent =
+            data.reply;
+
+
+        messages.appendChild(botMessage);
+
+
+        // SCROLL DOWN
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+
+    } catch (error) {
+
+        console.error(
+            "Chatbot Error:",
+            error
+        );
+
+
+        const errorMessage =
+            document.createElement("div");
+
+        errorMessage.className =
+            "bot-message";
+
+        errorMessage.textContent =
+            "❌ Sorry, I cannot connect to the hospital server right now.";
+
+
+        messages.appendChild(
+            errorMessage
+        );
+
+
+        messages.scrollTop =
+            messages.scrollHeight;
+    }
+}
+
+
+// ==================================================
+// START APPLICATION
+// ==================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadDashboard();
+
+        loadPatients();
+
+        loadDoctors();
+
+
+        // PATIENT FORM
+
+        const patientForm =
+            document.getElementById("patientForm");
+
+        if (patientForm) {
+
+            patientForm.addEventListener(
+                "submit",
+                addPatient
+            );
+
+        }
+
+
+        // DOCTOR FORM
+
+        const doctorForm =
+            document.getElementById("doctorForm");
+
+        if (doctorForm) {
+
+            doctorForm.addEventListener(
+                "submit",
+                addDoctor
+            );
+
+        }
+
+    }
+);

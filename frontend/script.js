@@ -949,12 +949,8 @@ async function addPrescription(event) {
         instructions: instructions
     });
 
-    const response = await fetch("/prescriptions", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: params
+    const response = await fetch("/prescriptions?" + params.toString(), {
+        method: "POST"
     });
 
     const data = await response.json();
@@ -969,7 +965,7 @@ async function addPrescription(event) {
 }
 
 async function loadPrescriptions() {
-    const response = await fetch("/prescriptions");
+    const response = await fetch(API_URL + "/prescriptions");
     const prescriptions = await response.json();
 
     const list = document.getElementById("prescriptionsList");
@@ -1200,3 +1196,109 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
+
+/* ================= CHATBOT ================= */
+
+function toggleChatbot() {
+    const chatbotBox = document.getElementById("chatbotBox");
+
+    if (!chatbotBox) {
+        return;
+    }
+
+    chatbotBox.classList.toggle("active");
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById("chatbotInput");
+    const messages = document.getElementById("chatbotMessages");
+
+    if (!input || !messages) {
+        return;
+    }
+
+    const message = input.value.trim();
+
+    if (message === "") {
+        return;
+    }
+
+    const userMessage = document.createElement("div");
+    userMessage.className = "user-message";
+    userMessage.textContent = message;
+
+    messages.appendChild(userMessage);
+    input.value = "";
+
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        const response = await fetch(
+            "http://127.0.0.1:8000/chatbot?message=" +
+            encodeURIComponent(message)
+        );
+
+        if (!response.ok) {
+            throw new Error("Chatbot request failed");
+        }
+
+        const data = await response.json();
+
+        const botMessage = document.createElement("div");
+        botMessage.className = "bot-message";
+        botMessage.textContent = data.reply;
+
+        messages.appendChild(botMessage);
+        messages.scrollTop = messages.scrollHeight;
+
+    } catch (error) {
+        console.error("Chatbot Error:", error);
+
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "bot-message";
+        errorMessage.textContent =
+            "❌ Sorry, I cannot connect to the hospital server.";
+
+        messages.appendChild(errorMessage);
+        messages.scrollTop = messages.scrollHeight;
+    }
+}
+
+// Load registered patients and doctors for prescriptions
+async function loadPrescriptionOptions() {
+    const patientSelect = document.getElementById("prescriptionPatientId");
+    const doctorSelect = document.getElementById("prescriptionDoctorId");
+
+    if (!patientSelect || !doctorSelect) return;
+
+    try {
+        const patientResponse = await fetch(API_URL + "/patients");
+        const patients = await patientResponse.json();
+
+        patientSelect.innerHTML = '<option value="">Select Patient</option>';
+
+        patients.forEach(function(patient) {
+            patientSelect.innerHTML += `
+                <option value="${patient.id}">${patient.name}</option>
+            `;
+        });
+
+        const doctorResponse = await fetch(API_URL + "/doctors");
+        const doctors = await doctorResponse.json();
+
+        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+
+        doctors.forEach(function(doctor) {
+            doctorSelect.innerHTML += `
+                <option value="${doctor.id}">
+                    ${doctor.name} - ${doctor.specialization}
+                </option>
+            `;
+        });
+
+    } catch (error) {
+        console.error("Prescription Options Error:", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadPrescriptionOptions);

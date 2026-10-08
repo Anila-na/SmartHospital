@@ -490,3 +490,128 @@ form button:hover {
     background: #2563eb;
 }
 
+
+/* ================= CHATBOT ================= */
+
+.chatbot {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+}
+
+.chatbot-button {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: #0f4c81;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+}
+
+.chatbot-button:hover {
+    transform: scale(1.08);
+}
+
+.chatbot-box {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 75px;
+    width: 330px;
+    height: 450px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+.chatbot-box.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbot-header {
+    background: #0f4c81;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f5f7fa;
+}
+
+.bot-message,
+.user-message {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    max-width: 85%;
+    line-height: 1.4;
+}
+
+.bot-message {
+    background: #e8f1f8;
+    color: #222;
+}
+
+.user-message {
+    background: #0f4c81;
+    color: white;
+    margin-left: auto;
+}
+
+.chatbot-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+.chatbot-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+}
+
+.chatbot-input button {
+    margin-left: 8px;
+    width: 45px;
+    border: none;
+    border-radius: 8px;
+    background: #0f4c81;
+    color: white;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .chatbot {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .chatbot-box {
+        width: 300px;
+    }
+}
+

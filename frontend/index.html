@@ -163,9 +163,13 @@
 
         <form id="prescriptionForm">
 
-            <input type="number" id="prescriptionPatientId" placeholder="Patient ID" required>
+            <select id="prescriptionPatientId" required>
+                <option value="">Select Patient</option>
+            </select>
 
-            <input type="number" id="prescriptionDoctorId" placeholder="Doctor ID" required>
+            <select id="prescriptionDoctorId" required>
+                <option value="">Select Doctor</option>
+            </select>
 
             <input type="text" id="prescriptionMedicine" placeholder="Medicine" required>
 
@@ -243,6 +247,48 @@
 </main>
 
 <script src="/script.js"></script>
+
+
+<!-- SMART HOSPITAL CHATBOT -->
+<div class="chatbot">
+    <button class="chatbot-button" onclick="toggleChatbot()" title="Smart Hospital Assistant">
+        🤖
+    </button>
+
+    <div class="chatbot-box" id="chatbotBox">
+        <div class="chatbot-header">
+            <strong>Smart Hospital Assistant</strong>
+            <button type="button" onclick="toggleChatbot()" class="chatbot-close">
+                ✕
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="bot-message">
+                👋 Hello!<br><br>
+                I'm your Smart Hospital Assistant.<br><br>
+                You can ask me about:<br>
+                👨‍⚕️ Doctors<br>
+                👤 Patients<br>
+                📅 Appointments<br>
+                💊 Prescriptions<br>
+                🏢 Departments<br>
+                📋 Medical Records
+            </div>
+        </div>
+
+        <div class="chatbot-input">
+            <input
+                type="text"
+                id="chatbotInput"
+                placeholder="Type your message..."
+                autocomplete="off"
+                onkeydown="if(event.key === 'Enter') sendChatMessage()"
+            >
+            <button type="button" onclick="sendChatMessage()">➤</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

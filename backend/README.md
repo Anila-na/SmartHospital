@@ -22,5 +22,6 @@ SmartHospital is a web-based hospital management system designed to make hospita
 
 ## Project Structure
 
-- backend – Backend/API files
-- frontend – Frontend website files
+- `backend` – Backend and API files
+- `frontend` – Website interface
+- `README.md` – Project information

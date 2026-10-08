@@ -12,14 +12,28 @@
 
 <body>
 
-    <!-- SIDEBAR -->
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
+
     <aside class="sidebar">
 
         <div class="logo">
-            <div class="hospital-icon">🏥</div>
-            <h2>Smart Hospital</h2>
-            <p>Management System</p>
+
+            <div class="hospital-icon">
+                🏥
+            </div>
+
+            <h2>
+                Smart Hospital
+            </h2>
+
+            <p>
+                Management System
+            </p>
+
         </div>
+
 
         <nav>
 
@@ -56,74 +70,175 @@
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- ==================================================
+         MAIN CONTENT
+    ================================================== -->
+
     <main class="main-content">
 
-        <!-- HEADER -->
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
+
         <header>
 
             <div>
-                <h1>Smart Hospital Dashboard</h1>
-                <p>Hospital Management System</p>
+
+                <h1>
+                    Smart Hospital Dashboard
+                </h1>
+
+                <p>
+                    Hospital Management System
+                </p>
+
             </div>
 
+
             <div class="admin">
-                👩‍💼 <span>Admin</span>
+
+                👩‍💼
+                <span>
+                    Admin
+                </span>
+
             </div>
 
         </header>
 
 
-        <!-- DASHBOARD -->
-        <section id="dashboard" class="section active">
+        <!-- ==================================================
+             DASHBOARD
+        ================================================== -->
 
-            <h2>Dashboard Overview</h2>
+        <section
+            id="dashboard"
+            class="section active"
+        >
+
+            <h2>
+                Dashboard Overview
+            </h2>
+
 
             <div class="cards">
 
-                <div class="card">
-                    <div class="icon">👤</div>
-                    <h3>Total Patients</h3>
-                    <p id="patientsCount">0</p>
-                </div>
 
                 <div class="card">
-                    <div class="icon">👨‍⚕️</div>
-                    <h3>Total Doctors</h3>
-                    <p id="doctorsCount">0</p>
+
+                    <div class="icon">
+                        👤
+                    </div>
+
+                    <h3>
+                        Total Patients
+                    </h3>
+
+                    <p id="patientsCount">
+                        0
+                    </p>
+
                 </div>
 
-                <div class="card">
-                    <div class="icon">📅</div>
-                    <h3>Appointments</h3>
-                    <p id="appointmentsCount">0</p>
-                </div>
 
                 <div class="card">
-                    <div class="icon">💊</div>
-                    <h3>Prescriptions</h3>
-                    <p id="prescriptionsCount">0</p>
+
+                    <div class="icon">
+                        👨‍⚕️
+                    </div>
+
+                    <h3>
+                        Total Doctors
+                    </h3>
+
+                    <p id="doctorsCount">
+                        0
+                    </p>
+
                 </div>
 
-                <div class="card">
-                    <div class="icon">🏢</div>
-                    <h3>Departments</h3>
-                    <p id="departmentsCount">0</p>
-                </div>
 
                 <div class="card">
-                    <div class="icon">📋</div>
-                    <h3>Medical Records</h3>
-                    <p id="recordsCount">0</p>
+
+                    <div class="icon">
+                        📅
+                    </div>
+
+                    <h3>
+                        Appointments
+                    </h3>
+
+                    <p id="appointmentsCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="icon">
+                        💊
+                    </div>
+
+                    <h3>
+                        Prescriptions
+                    </h3>
+
+                    <p id="prescriptionsCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="icon">
+                        🏢
+                    </div>
+
+                    <h3>
+                        Departments
+                    </h3>
+
+                    <p id="departmentsCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="icon">
+                        📋
+                    </div>
+
+                    <h3>
+                        Medical Records
+                    </h3>
+
+                    <p id="recordsCount">
+                        0
+                    </p>
+
                 </div>
 
             </div>
 
 
-            <!-- QUICK ACTIONS -->
+            <!-- ==================================================
+                 QUICK ACTIONS
+            ================================================== -->
+
             <div class="quick-section">
 
-                <h2>Quick Actions</h2>
+                <h2>
+                    Quick Actions
+                </h2>
+
 
                 <div class="quick-buttons">
 
@@ -150,18 +265,32 @@
         </section>
 
 
-        <!-- PATIENTS -->
-        <section id="patients" class="section">
+        <!-- ==================================================
+             PATIENTS
+        ================================================== -->
 
-            <h2>Patient Management</h2>
+        <section
+            id="patients"
+            class="section"
+        >
+
+            <h2>
+                Patient Management
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>➕ Add New Patient</h3>
+                <h3>
+                    ➕ Add New Patient
+                </h3>
+
 
                 <form id="patientForm">
 
-                    <label>Patient Name</label>
+                    <label>
+                        Patient Name
+                    </label>
 
                     <input
                         type="text"
@@ -170,7 +299,10 @@
                         required
                     >
 
-                    <label>Age</label>
+
+                    <label>
+                        Age
+                    </label>
 
                     <input
                         type="number"
@@ -179,9 +311,15 @@
                         required
                     >
 
-                    <label>Gender</label>
 
-                    <select id="patientGender" required>
+                    <label>
+                        Gender
+                    </label>
+
+                    <select
+                        id="patientGender"
+                        required
+                    >
 
                         <option value="">
                             Select Gender
@@ -197,7 +335,10 @@
 
                     </select>
 
-                    <label>Disease</label>
+
+                    <label>
+                        Disease
+                    </label>
 
                     <input
                         type="text"
@@ -205,6 +346,7 @@
                         placeholder="Enter disease"
                         required
                     >
+
 
                     <button
                         type="submit"
@@ -215,12 +357,21 @@
 
                 </form>
 
+
                 <p id="patientMessage"></p>
 
-                <h3>📋 Saved Patients</h3>
+
+                <h3>
+                    📋 Saved Patients
+                </h3>
+
 
                 <div id="patientsList">
-                    <p>Loading patients...</p>
+
+                    <p>
+                        Loading patients...
+                    </p>
+
                 </div>
 
             </div>
@@ -228,18 +379,32 @@
         </section>
 
 
-        <!-- DOCTORS -->
-        <section id="doctors" class="section">
+        <!-- ==================================================
+             DOCTORS
+        ================================================== -->
 
-            <h2>Doctor Management</h2>
+        <section
+            id="doctors"
+            class="section"
+        >
+
+            <h2>
+                Doctor Management
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>➕ Add New Doctor</h3>
+                <h3>
+                    ➕ Add New Doctor
+                </h3>
+
 
                 <form id="doctorForm">
 
-                    <label>Doctor Name</label>
+                    <label>
+                        Doctor Name
+                    </label>
 
                     <input
                         type="text"
@@ -248,7 +413,10 @@
                         required
                     >
 
-                    <label>Specialization</label>
+
+                    <label>
+                        Specialization
+                    </label>
 
                     <input
                         type="text"
@@ -257,7 +425,10 @@
                         required
                     >
 
-                    <label>Phone</label>
+
+                    <label>
+                        Phone
+                    </label>
 
                     <input
                         type="text"
@@ -265,6 +436,7 @@
                         placeholder="Enter phone number"
                         required
                     >
+
 
                     <button
                         type="submit"
@@ -275,12 +447,21 @@
 
                 </form>
 
+
                 <p id="doctorMessage"></p>
 
-                <h3>📋 Saved Doctors</h3>
+
+                <h3>
+                    📋 Saved Doctors
+                </h3>
+
 
                 <div id="doctorsList">
-                    <p>Loading doctors...</p>
+
+                    <p>
+                        Loading doctors...
+                    </p>
+
                 </div>
 
             </div>
@@ -288,20 +469,36 @@
         </section>
 
 
-        <!-- APPOINTMENTS -->
-        <section id="appointments" class="section">
+        <!-- ==================================================
+             APPOINTMENTS
+        ================================================== -->
 
-            <h2>Appointment Management</h2>
+        <section
+            id="appointments"
+            class="section"
+        >
+
+            <h2>
+                Appointment Management
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>Appointments</h3>
+                <h3>
+                    📅 Appointments
+                </h3>
+
 
                 <p>
                     Schedule and manage patient appointments.
                 </p>
 
-                <button class="primary-btn">
+
+                <button
+                    class="primary-btn"
+                    onclick="alert('Appointment module will be available soon.')"
+                >
                     📅 Book Appointment
                 </button>
 
@@ -310,20 +507,36 @@
         </section>
 
 
-        <!-- PRESCRIPTIONS -->
-        <section id="prescriptions" class="section">
+        <!-- ==================================================
+             PRESCRIPTIONS
+        ================================================== -->
 
-            <h2>Prescription Management</h2>
+        <section
+            id="prescriptions"
+            class="section"
+        >
+
+            <h2>
+                Prescription Management
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>Prescriptions</h3>
+                <h3>
+                    💊 Prescriptions
+                </h3>
+
 
                 <p>
                     Manage patient medicines, dosage and instructions.
                 </p>
 
-                <button class="primary-btn">
+
+                <button
+                    class="primary-btn"
+                    onclick="alert('Prescription module will be available soon.')"
+                >
                     💊 Add Prescription
                 </button>
 
@@ -332,20 +545,36 @@
         </section>
 
 
-        <!-- DEPARTMENTS -->
-        <section id="departments" class="section">
+        <!-- ==================================================
+             DEPARTMENTS
+        ================================================== -->
 
-            <h2>Hospital Departments</h2>
+        <section
+            id="departments"
+            class="section"
+        >
+
+            <h2>
+                Hospital Departments
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>Departments</h3>
+                <h3>
+                    🏢 Departments
+                </h3>
+
 
                 <p>
                     Manage hospital departments and head doctors.
                 </p>
 
-                <button class="primary-btn">
+
+                <button
+                    class="primary-btn"
+                    onclick="alert('Department module will be available soon.')"
+                >
                     ➕ Add Department
                 </button>
 
@@ -354,20 +583,36 @@
         </section>
 
 
-        <!-- MEDICAL RECORDS -->
-        <section id="records" class="section">
+        <!-- ==================================================
+             MEDICAL RECORDS
+        ================================================== -->
 
-            <h2>Medical Records</h2>
+        <section
+            id="records"
+            class="section"
+        >
+
+            <h2>
+                Medical Records
+            </h2>
+
 
             <div class="management-box">
 
-                <h3>Patient Medical Records</h3>
+                <h3>
+                    📋 Patient Medical Records
+                </h3>
+
 
                 <p>
                     View diagnosis, symptoms, treatment and medical history.
                 </p>
 
-                <button class="primary-btn">
+
+                <button
+                    class="primary-btn"
+                    onclick="alert('Medical records module will be available soon.')"
+                >
                     📋 Add Medical Record
                 </button>
 
@@ -377,6 +622,125 @@
 
     </main>
 
+
+    <!-- ==================================================
+         SMART HOSPITAL CHATBOT
+    ================================================== -->
+
+    <div class="chatbot">
+
+        <!-- CHATBOT FLOATING BUTTON -->
+
+        <button
+            class="chatbot-button"
+            onclick="toggleChatbot()"
+            title="Smart Hospital Assistant"
+        >
+            🤖
+        </button>
+
+
+        <!-- CHATBOT WINDOW -->
+
+        <div
+            class="chatbot-box"
+            id="chatbotBox"
+        >
+
+
+            <!-- CHATBOT HEADER -->
+
+            <div class="chatbot-header">
+
+                <div>
+
+                    <strong>
+                        Smart Hospital Assistant
+                    </strong>
+
+                    <small>
+                        ● Online
+                    </small>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="toggleChatbot()"
+                    class="chatbot-close"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <!-- CHAT MESSAGES -->
+
+            <div
+                class="chatbot-messages"
+                id="chatbotMessages"
+            >
+
+                <div class="bot-message">
+
+                    👋 Hello!
+
+                    <br><br>
+
+                    I'm your Smart Hospital Assistant.
+
+                    <br><br>
+
+                    You can ask me about:
+
+                    <br>
+                    👨‍⚕️ Doctors
+                    <br>
+                    👤 Patients
+                    <br>
+                    📅 Appointments
+                    <br>
+                    💊 Prescriptions
+                    <br>
+                    🏢 Departments
+                    <br>
+                    📋 Medical Records
+
+                </div>
+
+            </div>
+
+
+            <!-- CHAT INPUT -->
+
+            <div class="chatbot-input">
+
+                <input
+                    type="text"
+                    id="chatbotInput"
+                    placeholder="Type your message..."
+                    autocomplete="off"
+                    onkeydown="if(event.key === 'Enter') sendChatMessage()"
+                >
+
+
+                <button
+                    type="button"
+                    onclick="sendChatMessage()"
+                >
+                    ➤
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
 
     <script src="/script.js"></script>
 

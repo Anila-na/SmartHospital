@@ -490,3 +490,117 @@ def add_medical_record(
 @app.get("/medical-records")
 def get_medical_records(db: Session = Depends(get_db)):
     return db.query(MedicalRecord).all()
+
+
+# ==================================================
+# SMART HOSPITAL CHATBOT
+# ==================================================
+
+@app.get("/chatbot")
+def chatbot(
+    message: str,
+    db: Session = Depends(get_db)
+):
+
+    user_message = message.lower().strip()
+
+    # Greeting
+    if "hello" in user_message or "hi" in user_message:
+        reply = (
+            "Hello! 👋 Welcome to Smart Hospital. "
+            "How can I help you?"
+        )
+
+    # Hospital
+    elif "hospital" in user_message:
+        reply = (
+            "🏥 Welcome to Smart Hospital Management System. "
+            "I can help you with doctors, patients, appointments, "
+            "prescriptions, departments and medical records."
+        )
+
+    # Doctors
+    elif "doctor" in user_message:
+        total_doctors = db.query(Doctor).count()
+
+        reply = (
+            f"👨‍⚕️ There are currently "
+            f"{total_doctors} doctors registered in the hospital."
+        )
+
+    # Patients
+    elif "patient" in user_message:
+        total_patients = db.query(Patient).count()
+
+        reply = (
+            f"👤 There are currently "
+            f"{total_patients} patients registered in the system."
+        )
+
+    # Appointments
+    elif "appointment" in user_message:
+        total_appointments = db.query(Appointment).count()
+
+        reply = (
+            f"📅 There are currently "
+            f"{total_appointments} appointments in the system."
+        )
+
+    # Prescriptions
+    elif (
+        "prescription" in user_message
+        or "medicine" in user_message
+    ):
+        total_prescriptions = db.query(Prescription).count()
+
+        reply = (
+            f"💊 There are currently "
+            f"{total_prescriptions} prescriptions in the system."
+        )
+
+    # Departments
+    elif "department" in user_message:
+        total_departments = db.query(Department).count()
+
+        reply = (
+            f"🏢 The hospital currently has "
+            f"{total_departments} departments."
+        )
+
+    # Medical Records
+    elif (
+        "record" in user_message
+        or "medical history" in user_message
+    ):
+        total_records = db.query(MedicalRecord).count()
+
+        reply = (
+            f"📋 There are currently "
+            f"{total_records} medical records in the system."
+        )
+
+    # Thanks
+    elif "thank" in user_message:
+        reply = (
+            "You're welcome! 😊 "
+            "I'm always here to help."
+        )
+
+    # Goodbye
+    elif "bye" in user_message:
+        reply = (
+            "Goodbye! 👋 Have a healthy day."
+        )
+
+    # Unknown question
+    else:
+        reply = (
+            "🤖 I'm sorry, I didn't understand that. "
+            "You can ask me about doctors, patients, "
+            "appointments, prescriptions, departments "
+            "or medical records."
+        )
+
+    return {
+        "reply": reply
+    }
