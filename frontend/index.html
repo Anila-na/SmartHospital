@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Hospital Management System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🏥 Smart Hospital Management System</h1>
+    <p>Hospital Management Dashboard</p>
+</header>
+
+<nav>
+    <button onclick="showSection('dashboardSection')">Dashboard</button>
+    <button onclick="showSection('patientSection')">Patients</button>
+    <button onclick="showSection('doctorSection')">Doctors</button>
+    <button onclick="showSection('appointmentSection')">Appointments</button>
+    <button onclick="showSection('prescriptionSection')">Prescriptions</button>
+    <button onclick="showSection('departmentSection')">Departments</button>
+    <button onclick="showSection('recordSection')">Medical Records</button>
+</nav>
+
+<main>
+
+    <!-- DASHBOARD -->
+    <section id="dashboardSection">
+        <h2>📊 Dashboard</h2>
+
+        <div class="dashboard-cards">
+
+            <div class="card">
+                <h3>Patients</h3>
+                <p id="totalPatients">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Doctors</h3>
+                <p id="totalDoctors">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Appointments</h3>
+                <p id="totalAppointments">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Prescriptions</h3>
+                <p id="totalPrescriptions">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Departments</h3>
+                <p id="totalDepartments">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Medical Records</h3>
+                <p id="totalMedicalRecords">0</p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- PATIENTS -->
+    <section id="patientSection" style="display:none;">
+        <h2>👤 Patient Management</h2>
+
+        <form id="patientForm">
+
+            <input type="text" id="patientName" placeholder="Patient Name" required>
+
+            <input type="number" id="patientAge" placeholder="Age" required>
+
+            <select id="patientGender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            <input type="text" id="patientDisease" placeholder="Disease" required>
+
+            <button type="submit">Add Patient</button>
+
+        </form>
+
+        <p id="patientMessage"></p>
+
+        <h3>Patient List</h3>
+
+        <div id="patientsList"></div>
+    </section>
+
+
+    <!-- DOCTORS -->
+    <section id="doctorSection" style="display:none;">
+        <h2>👨‍⚕️ Doctor Management</h2>
+
+        <form id="doctorForm">
+
+            <input type="text" id="doctorName" placeholder="Doctor Name" required>
+
+            <input type="text" id="doctorSpecialization" placeholder="Specialization" required>
+
+            <input type="text" id="doctorPhone" placeholder="Phone Number" required>
+
+            <button type="submit">Add Doctor</button>
+
+        </form>
+
+        <p id="doctorMessage"></p>
+
+        <h3>Doctor List</h3>
+
+        <div id="doctorsList"></div>
+    </section>
+
+
+    <!-- APPOINTMENTS -->
+    <section id="appointmentSection" style="display:none;">
+        <h2>📅 Appointment Management</h2>
+
+        <form id="appointmentForm">
+
+            <label>Patient</label>
+            <select id="appointmentPatient" required>
+                <option value="">Select Patient</option>
+            </select>
+
+            <label>Doctor</label>
+            <select id="appointmentDoctor" required>
+                <option value="">Select Doctor</option>
+            </select>
+
+            <label>Date</label>
+            <input type="date" id="appointmentDate" required>
+
+            <label>Time</label>
+            <input type="time" id="appointmentTime" required>
+
+            <label>Reason</label>
+            <input type="text" id="appointmentReason" placeholder="Reason for appointment" required>
+
+            <button type="submit">Book Appointment</button>
+
+        </form>
+
+        <p id="appointmentMessage"></p>
+
+        <h3>Appointment List</h3>
+
+        <div id="appointmentsList"></div>
+    </section>
+
+
+    <!-- PRESCRIPTIONS -->
+    <section id="prescriptionSection" style="display:none;">
+        <h2>💊 Prescription Management</h2>
+
+        <form id="prescriptionForm">
+
+            <input type="number" id="prescriptionPatientId" placeholder="Patient ID" required>
+
+            <input type="number" id="prescriptionDoctorId" placeholder="Doctor ID" required>
+
+            <input type="text" id="prescriptionMedicine" placeholder="Medicine" required>
+
+            <input type="text" id="prescriptionDosage" placeholder="Dosage" required>
+
+            <input type="text" id="prescriptionDuration" placeholder="Duration" required>
+
+            <input type="text" id="prescriptionInstructions" placeholder="Instructions" required>
+
+            <button type="submit">Add Prescription</button>
+
+        </form>
+
+        <p id="prescriptionMessage"></p>
+
+        <h3>Prescription List</h3>
+
+        <div id="prescriptionsList"></div>
+    </section>
+
+
+    <!-- DEPARTMENTS -->
+    <section id="departmentSection" style="display:none;">
+        <h2>🏢 Department Management</h2>
+
+        <form id="departmentForm">
+
+            <input type="text" id="departmentName" placeholder="Department Name" required>
+
+            <input type="text" id="departmentLocation" placeholder="Location" required>
+
+            <input type="text" id="departmentHead" placeholder="Head Doctor" required>
+
+            <button type="submit">Add Department</button>
+
+        </form>
+
+        <p id="departmentMessage"></p>
+
+        <h3>Department List</h3>
+
+        <div id="departmentsList"></div>
+    </section>
+
+
+    <!-- MEDICAL RECORDS -->
+    <section id="recordSection" style="display:none;">
+        <h2>📋 Medical Record Management</h2>
+
+        <form id="recordForm">
+
+            <input type="number" id="recordPatientId" placeholder="Patient ID" required>
+
+            <input type="number" id="recordDoctorId" placeholder="Doctor ID" required>
+
+            <input type="text" id="recordDiagnosis" placeholder="Diagnosis" required>
+
+            <input type="text" id="recordSymptoms" placeholder="Symptoms" required>
+
+            <input type="text" id="recordTreatment" placeholder="Treatment" required>
+
+            <input type="date" id="recordDate" required>
+
+            <button type="submit">Add Medical Record</button>
+
+        </form>
+
+        <p id="recordMessage"></p>
+
+        <h3>Medical Record List</h3>
+
+        <div id="recordsList"></div>
+    </section>
+
+</main>
+
+<script src="/script.js"></script>
+
+</body>
+</html>
