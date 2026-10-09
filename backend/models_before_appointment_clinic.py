@@ -32,7 +32,6 @@ class Appointment(Base):
     date = Column(String, nullable=False)
     time = Column(String, nullable=False)
     reason = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 
 class Prescription(Base):
@@ -45,7 +44,6 @@ class Prescription(Base):
     dosage = Column(String, nullable=False)
     duration = Column(String, nullable=False)
     instructions = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 
 class Department(Base):
@@ -55,7 +53,6 @@ class Department(Base):
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     head_doctor = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 
 class MedicalRecord(Base):
@@ -68,7 +65,6 @@ class MedicalRecord(Base):
     symptoms = Column(String, nullable=False)
     treatment = Column(String, nullable=False)
     record_date = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 class Clinic(Base):
     __tablename__ = "clinics"

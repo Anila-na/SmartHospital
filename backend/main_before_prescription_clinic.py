@@ -76,32 +76,19 @@ def script():
 
 @app.get("/dashboard")
 def dashboard(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    patients = db.query(Patient)
-    doctors = db.query(Doctor)
-    appointments = db.query(Appointment)
-    prescriptions = db.query(Prescription)
-    departments = db.query(Department)
-    medical_records = db.query(MedicalRecord)
-
-    if clinic_id is not None:
-        patients = patients.filter(Patient.clinic_id == clinic_id)
-        doctors = doctors.filter(Doctor.clinic_id == clinic_id)
-        appointments = appointments.filter(Appointment.clinic_id == clinic_id)
-        prescriptions = prescriptions.filter(Prescription.clinic_id == clinic_id)
-        departments = departments.filter(Department.clinic_id == clinic_id)
-        medical_records = medical_records.filter(MedicalRecord.clinic_id == clinic_id)
 
     return {
         "hospital": "Smart Hospital Management System",
-        "total_patients": patients.count(),
-        "total_doctors": doctors.count(),
-        "total_appointments": appointments.count(),
-        "total_prescriptions": prescriptions.count(),
-        "total_departments": departments.count(),
-        "total_medical_records": medical_records.count()
+        "total_patients": db.query(Patient).filter(Patient.clinic_id == clinic_id).count() if clinic_id is not None else db.query(Patient).count(),
+        "total_doctors": db.query(Doctor).filter(Doctor.clinic_id == clinic_id).count() if clinic_id is not None else db.query(Doctor).count(),
+        "total_appointments": db.query(Appointment).filter(Appointment.clinic_id == clinic_id).count() if clinic_id is not None else db.query(Appointment).count(),
+        "total_prescriptions": db.query(Prescription).count(),
+        "total_departments": db.query(Department).count(),
+        "total_medical_records": db.query(MedicalRecord).count()
     }
 
 
+# ==================================================
 # PATIENTS
 # ==================================================
 
@@ -422,17 +409,16 @@ def add_prescription(
     dosage: str,
     duration: str,
     instructions: str,
-    clinic_id: int | None = None,
     db: Session = Depends(get_db)
 ):
+
     prescription = Prescription(
         patient_id=patient_id,
         doctor_id=doctor_id,
         medicine=medicine,
         dosage=dosage,
         duration=duration,
-        instructions=instructions,
-        clinic_id=clinic_id
+        instructions=instructions
     )
 
     db.add(prescription)
@@ -446,11 +432,8 @@ def add_prescription(
 
 
 @app.get("/prescriptions")
-def get_prescriptions(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(Prescription)
-    if clinic_id is not None:
-        query = query.filter(Prescription.clinic_id == clinic_id)
-    return query.all()
+def get_prescriptions(db: Session = Depends(get_db)):
+    return db.query(Prescription).all()
 
 
 # ==================================================
@@ -462,14 +445,13 @@ def add_department(
     name: str,
     location: str,
     head_doctor: str,
-    clinic_id: int | None = None,
     db: Session = Depends(get_db)
 ):
+
     department = Department(
         name=name,
         location=location,
-        head_doctor=head_doctor,
-        clinic_id=clinic_id
+        head_doctor=head_doctor
     )
 
     db.add(department)
@@ -483,18 +465,11 @@ def add_department(
 
 
 @app.get("/departments")
-def get_departments(
-    clinic_id: int | None = None,
-    db: Session = Depends(get_db)
-):
-    query = db.query(Department)
-
-    if clinic_id is not None:
-        query = query.filter(Department.clinic_id == clinic_id)
-
-    return query.all()
+def get_departments(db: Session = Depends(get_db)):
+    return db.query(Department).all()
 
 
+# ==================================================
 # MEDICAL RECORDS
 # ==================================================
 
@@ -506,17 +481,16 @@ def add_medical_record(
     symptoms: str,
     treatment: str,
     record_date: str,
-    clinic_id: int | None = None,
     db: Session = Depends(get_db)
 ):
+
     record = MedicalRecord(
         patient_id=patient_id,
         doctor_id=doctor_id,
         diagnosis=diagnosis,
         symptoms=symptoms,
         treatment=treatment,
-        record_date=record_date,
-        clinic_id=clinic_id
+        record_date=record_date
     )
 
     db.add(record)
@@ -530,11 +504,8 @@ def add_medical_record(
 
 
 @app.get("/medical-records")
-def get_medical_records(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(MedicalRecord)
-    if clinic_id is not None:
-        query = query.filter(MedicalRecord.clinic_id == clinic_id)
-    return query.all()
+def get_medical_records(db: Session = Depends(get_db)):
+    return db.query(MedicalRecord).all()
 
 
 # ==================================================

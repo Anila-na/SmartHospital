@@ -969,7 +969,7 @@ async function addPrescription(event) {
 }
 
 async function loadPrescriptions() {
-    const response = await fetch("/prescriptions");
+    const response = await fetch(API_URL + "/prescriptions");
     const prescriptions = await response.json();
 
     const list = document.getElementById("prescriptionsList");

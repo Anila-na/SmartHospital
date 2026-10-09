@@ -55,7 +55,6 @@ class Department(Base):
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     head_doctor = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 
 class MedicalRecord(Base):

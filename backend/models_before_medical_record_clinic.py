@@ -55,7 +55,6 @@ class Department(Base):
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     head_doctor = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 
 class MedicalRecord(Base):
@@ -68,7 +67,6 @@ class MedicalRecord(Base):
     symptoms = Column(String, nullable=False)
     treatment = Column(String, nullable=False)
     record_date = Column(String, nullable=False)
-    clinic_id = Column(Integer, nullable=True)
 
 class Clinic(Base):
     __tablename__ = "clinics"
