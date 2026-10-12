@@ -9,19 +9,53 @@
 
 <body>
 
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="login-icon">🏥</div>
+        <h2>Smart Hospital</h2>
+        <p>Sign in to your hospital account</p>
+
+        <form id="loginForm">
+            <label for="loginEmail">Email Address</label>
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Enter your email"
+                autocomplete="username"
+                required
+            >
+
+            <label for="loginPassword">Password</label>
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit" id="loginButton">Login</button>
+            <p id="loginMessage" role="alert"></p>
+        </form>
+    </div>
+</div>
+
+<div id="appShell" style="display:none;">
 <header>
     <h1>🏥 Smart Hospital Management System</h1>
     <p>Hospital Management Dashboard</p>
+    <button type="button" id="logoutButton">Logout</button>
 </header>
 
 <nav>
-    <button onclick="showSection('dashboardSection')">Dashboard</button>
-    <button onclick="showSection('patientSection')">Patients</button>
-    <button onclick="showSection('doctorSection')">Doctors</button>
-    <button onclick="showSection('appointmentSection')">Appointments</button>
-    <button onclick="showSection('prescriptionSection')">Prescriptions</button>
-    <button onclick="showSection('departmentSection')">Departments</button>
-    <button onclick="showSection('recordSection')">Medical Records</button>
+    <button id="navDashboard" onclick="showSection('dashboardSection')">Dashboard</button>
+    <button id="navPatients" onclick="showSection('patientSection')">Patients</button>
+    <button id="navDoctors" onclick="showSection('doctorSection')">Doctors</button>
+    <button id="navAppointments" onclick="showSection('appointmentSection')">Appointments</button>
+    <button id="navPrescriptions" onclick="showSection('prescriptionSection')">Prescriptions</button>
+    <button id="navDepartments" onclick="showSection('departmentSection')">Departments</button>
+    <button id="navMedicalRecords" onclick="showSection('recordSection')">Medical Records</button>
+    <button id="navClinics" onclick="showSection('clinicSection')">Clinics</button>
 </nav>
 
 <main>
@@ -60,6 +94,11 @@
             <div class="card">
                 <h3>Medical Records</h3>
                 <p id="totalMedicalRecords">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Clinics</h3>
+                <p id="totalClinics">0</p>
             </div>
 
         </div>
@@ -244,6 +283,20 @@
         <div id="recordsList"></div>
     </section>
 
+    <!-- CLINICS -->
+    <section id="clinicSection" style="display:none;">
+        <h2>🏥 Clinic Management</h2>
+        <form id="clinicForm">
+            <input type="text" id="clinicName" placeholder="Clinic Name" required>
+            <input type="text" id="clinicAddress" placeholder="Clinic Address" required>
+            <input type="text" id="clinicPhone" placeholder="Phone Number" required>
+            <button type="submit">Add Clinic</button>
+        </form>
+        <p id="clinicMessage"></p>
+        <h3>Registered Clinics</h3>
+        <div id="clinicsList">Loading clinics...</div>
+    </section>
+
 </main>
 
 <script src="/script.js"></script>
@@ -290,5 +343,6 @@
     </div>
 </div>
 
+</div>
 </body>
 </html>

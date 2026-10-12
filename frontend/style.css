@@ -615,3 +615,112 @@ form button:hover {
     }
 }
 
+
+/* ================= LOGIN SCREEN ================= */
+
+.login-screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #eaf2fb, #d6e6f7);
+    box-sizing: border-box;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 410px;
+    padding: 35px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(18, 60, 105, 0.15);
+    box-sizing: border-box;
+}
+
+.login-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.login-card h2 {
+    text-align: center;
+    color: #123c69;
+    margin: 0 0 10px;
+}
+
+.login-card > p {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 28px;
+}
+
+.login-card label {
+    display: block;
+    margin: 16px 0 7px;
+    color: #334155;
+    font-weight: 600;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.login-card input:focus {
+    outline: 2px solid #93c5fd;
+    border-color: #2563eb;
+}
+
+#loginButton {
+    width: 100%;
+    margin-top: 22px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #123c69;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#loginButton:hover {
+    background: #1e5a91;
+}
+
+#loginMessage {
+    color: #b91c1c;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 14px;
+}
+
+
+/* LOGOUT BUTTON */
+#logoutButton {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+}
+
+#logoutButton:hover {
+    background: #b02a37;
+}
+
+#logoutButton:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 3px;
+}

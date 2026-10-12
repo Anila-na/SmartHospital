@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 
 from backend.database import engine, get_db, Base
+from backend.auth import router as auth_router, get_current_user
 from backend.models import (
     Patient,
     Doctor,
@@ -12,6 +13,7 @@ from backend.models import (
     Department,
     MedicalRecord,
     Clinic,
+    User,
 )
 
 
@@ -19,7 +21,13 @@ from backend.models import (
 # CREATE FASTAPI APP
 # ==================================================
 
+def require_role(user: User, allowed_roles: list[str]) -> None:
+    if user.role not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Aapko is action ki permission nahi hai")
+
+
 app = FastAPI(title="Smart Hospital Management System")
+app.include_router(auth_router)
 
 
 # ==================================================
@@ -75,32 +83,22 @@ def script():
 # ==================================================
 
 @app.get("/dashboard")
-def dashboard(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    patients = db.query(Patient)
-    doctors = db.query(Doctor)
-    appointments = db.query(Appointment)
-    prescriptions = db.query(Prescription)
-    departments = db.query(Department)
-    medical_records = db.query(MedicalRecord)
-
-    if clinic_id is not None:
-        patients = patients.filter(Patient.clinic_id == clinic_id)
-        doctors = doctors.filter(Doctor.clinic_id == clinic_id)
-        appointments = appointments.filter(Appointment.clinic_id == clinic_id)
-        prescriptions = prescriptions.filter(Prescription.clinic_id == clinic_id)
-        departments = departments.filter(Department.clinic_id == clinic_id)
-        medical_records = medical_records.filter(MedicalRecord.clinic_id == clinic_id)
+def dashboard(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    clinic_id = current_user.clinic_id
 
     return {
         "hospital": "Smart Hospital Management System",
-        "total_patients": patients.count(),
-        "total_doctors": doctors.count(),
-        "total_appointments": appointments.count(),
-        "total_prescriptions": prescriptions.count(),
-        "total_departments": departments.count(),
-        "total_medical_records": medical_records.count()
+        "total_patients": db.query(Patient).filter(Patient.clinic_id == clinic_id).count(),
+        "total_doctors": db.query(Doctor).filter(Doctor.clinic_id == clinic_id).count(),
+        "total_appointments": db.query(Appointment).filter(Appointment.clinic_id == clinic_id).count(),
+        "total_prescriptions": db.query(Prescription).filter(Prescription.clinic_id == clinic_id).count(),
+        "total_departments": db.query(Department).filter(Department.clinic_id == clinic_id).count(),
+        "total_medical_records": db.query(MedicalRecord).filter(MedicalRecord.clinic_id == clinic_id).count(),
+        "total_clinics": db.query(Clinic).filter(Clinic.id == clinic_id).count()
     }
-
 
 # PATIENTS
 # ==================================================
@@ -111,16 +109,17 @@ def add_patient(
     age: int,
     gender: str,
     disease: str,
-    clinic_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin", "Receptionist"])
 
     patient = Patient(
         name=name,
         age=age,
         gender=gender,
         disease=disease,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(patient)
@@ -134,27 +133,28 @@ def add_patient(
 
 
 @app.get("/patients")
-def get_patients(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(Patient)
-    if clinic_id is not None:
-        query = query.filter(Patient.clinic_id == clinic_id)
-    return query.all()
+def get_patients(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(Patient).filter(
+        Patient.clinic_id == current_user.clinic_id
+    ).all()
 
 
 @app.get("/patients/{patient_id}")
 def get_patient(
     patient_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
     patient = db.query(Patient).filter(
-        Patient.id == patient_id
+        Patient.id == patient_id,
+        Patient.clinic_id == current_user.clinic_id
     ).first()
 
-    if not patient:
-        return {
-            "message": "Patient not found"
-        }
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Patient not found")
 
     return patient
 
@@ -166,17 +166,18 @@ def update_patient(
     age: int,
     gender: str,
     disease: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin", "Receptionist"])
 
     patient = db.query(Patient).filter(
-        Patient.id == patient_id
+        Patient.id == patient_id,
+        Patient.clinic_id == current_user.clinic_id
     ).first()
 
-    if not patient:
-        return {
-            "message": "Patient not found"
-        }
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Patient not found")
 
     patient.name = name
     patient.age = age
@@ -195,17 +196,18 @@ def update_patient(
 @app.delete("/patients/{patient_id}")
 def delete_patient(
     patient_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
 
     patient = db.query(Patient).filter(
-        Patient.id == patient_id
+        Patient.id == patient_id,
+        Patient.clinic_id == current_user.clinic_id
     ).first()
 
-    if not patient:
-        return {
-            "message": "Patient not found"
-        }
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Patient not found")
 
     db.delete(patient)
     db.commit()
@@ -225,15 +227,16 @@ def add_doctor(
     name: str,
     specialization: str,
     phone: str,
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
 
     doctor = Doctor(
         name=name,
         specialization=specialization,
         phone=phone,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(doctor)
@@ -247,10 +250,8 @@ def add_doctor(
 
 
 @app.get("/doctors")
-def get_doctors(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(Doctor)
-    if clinic_id is not None:
-        query = query.filter(Doctor.clinic_id == clinic_id)
+def get_doctors(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    query = db.query(Doctor).filter(Doctor.clinic_id == current_user.clinic_id)
     return query.all()
 
 
@@ -260,17 +261,18 @@ def update_doctor(
     name: str,
     specialization: str,
     phone: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
 
     doctor = db.query(Doctor).filter(
-        Doctor.id == doctor_id
+        Doctor.id == doctor_id,
+        Doctor.clinic_id == current_user.clinic_id
     ).first()
 
     if not doctor:
-        return {
-            "message": "Doctor not found"
-        }
+        raise HTTPException(status_code=404, detail="Doctor not found in your clinic")
 
     doctor.name = name
     doctor.specialization = specialization
@@ -288,17 +290,21 @@ def update_doctor(
 @app.delete("/doctors/{doctor_id}")
 def delete_doctor(
     doctor_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
 
     doctor = db.query(Doctor).filter(
-        Doctor.id == doctor_id
+        Doctor.id == doctor_id,
+        Doctor.clinic_id == current_user.clinic_id
     ).first()
 
     if not doctor:
-        return {
-            "message": "Doctor not found"
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Doctor not found in your clinic"
+        )
 
     db.delete(doctor)
     db.commit()
@@ -313,6 +319,35 @@ def delete_doctor(
 # APPOINTMENTS
 # ==================================================
 
+def validate_appointment_clinic(
+    patient_id: int,
+    doctor_id: int,
+    current_user: User,
+    db: Session
+) -> None:
+    patient = db.query(Patient).filter(
+        Patient.id == patient_id,
+        Patient.clinic_id == current_user.clinic_id
+    ).first()
+
+    if patient is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient not found in your clinic"
+        )
+
+    doctor = db.query(Doctor).filter(
+        Doctor.id == doctor_id,
+        Doctor.clinic_id == current_user.clinic_id
+    ).first()
+
+    if doctor is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Doctor not found in your clinic"
+        )
+
+
 @app.post("/appointments")
 def add_appointment(
     patient_id: int,
@@ -320,9 +355,11 @@ def add_appointment(
     date: str,
     time: str,
     reason: str,
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
+    validate_appointment_clinic(patient_id, doctor_id, current_user, db)
 
     appointment = Appointment(
         patient_id=patient_id,
@@ -330,7 +367,7 @@ def add_appointment(
         date=date,
         time=time,
         reason=reason,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(appointment)
@@ -344,11 +381,13 @@ def add_appointment(
 
 
 @app.get("/appointments")
-def get_appointments(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(Appointment)
-    if clinic_id is not None:
-        query = query.filter(Appointment.clinic_id == clinic_id)
-    return query.all()
+def get_appointments(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(Appointment).filter(
+        Appointment.clinic_id == current_user.clinic_id
+    ).all()
 
 
 @app.put("/appointments/{appointment_id}")
@@ -359,17 +398,22 @@ def update_appointment(
     date: str,
     time: str,
     reason: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
+    validate_appointment_clinic(patient_id, doctor_id, current_user, db)
 
     appointment = db.query(Appointment).filter(
-        Appointment.id == appointment_id
+        Appointment.id == appointment_id,
+        Appointment.clinic_id == current_user.clinic_id
     ).first()
 
     if not appointment:
-        return {
-            "message": "Appointment not found"
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Appointment not found in your clinic"
+        )
 
     appointment.patient_id = patient_id
     appointment.doctor_id = doctor_id
@@ -389,17 +433,21 @@ def update_appointment(
 @app.delete("/appointments/{appointment_id}")
 def delete_appointment(
     appointment_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
 
     appointment = db.query(Appointment).filter(
-        Appointment.id == appointment_id
+        Appointment.id == appointment_id,
+        Appointment.clinic_id == current_user.clinic_id
     ).first()
 
     if not appointment:
-        return {
-            "message": "Appointment not found"
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Appointment not found in your clinic"
+        )
 
     db.delete(appointment)
     db.commit()
@@ -422,9 +470,11 @@ def add_prescription(
     dosage: str,
     duration: str,
     instructions: str,
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
+
     prescription = Prescription(
         patient_id=patient_id,
         doctor_id=doctor_id,
@@ -432,7 +482,7 @@ def add_prescription(
         dosage=dosage,
         duration=duration,
         instructions=instructions,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(prescription)
@@ -446,11 +496,74 @@ def add_prescription(
 
 
 @app.get("/prescriptions")
-def get_prescriptions(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(Prescription)
-    if clinic_id is not None:
-        query = query.filter(Prescription.clinic_id == clinic_id)
-    return query.all()
+def get_prescriptions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(Prescription).filter(
+        Prescription.clinic_id == current_user.clinic_id
+    ).all()
+
+
+@app.put("/prescriptions/{prescription_id}")
+def update_prescription(
+    prescription_id: int,
+    data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    prescription = db.query(Prescription).filter(
+        Prescription.id == prescription_id,
+        Prescription.clinic_id == current_user.clinic_id
+    ).first()
+
+    if not prescription:
+        raise HTTPException(
+            status_code=404,
+            detail="Prescription not found in your clinic"
+        )
+
+    for field in [
+        "patient_id", "doctor_id", "medicine",
+        "dosage", "duration", "instructions"
+    ]:
+        if field in data:
+            setattr(prescription, field, data[field])
+
+    db.commit()
+    db.refresh(prescription)
+
+    return {
+        "message": "Prescription updated successfully!",
+        "prescription_id": prescription.id
+    }
+
+
+@app.delete("/prescriptions/{prescription_id}")
+def delete_prescription(
+    prescription_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    prescription = db.query(Prescription).filter(
+        Prescription.id == prescription_id,
+        Prescription.clinic_id == current_user.clinic_id
+    ).first()
+
+    if prescription is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Prescription not found in your clinic"
+        )
+
+    db.delete(prescription)
+    db.commit()
+
+    return {"message": "Prescription deleted successfully!"}
 
 
 # ==================================================
@@ -462,14 +575,16 @@ def add_department(
     name: str,
     location: str,
     head_doctor: str,
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
+
     department = Department(
         name=name,
         location=location,
         head_doctor=head_doctor,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(department)
@@ -484,18 +599,14 @@ def add_department(
 
 @app.get("/departments")
 def get_departments(
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    query = db.query(Department)
-
-    if clinic_id is not None:
-        query = query.filter(Department.clinic_id == clinic_id)
-
-    return query.all()
+    return db.query(Department).filter(
+        Department.clinic_id == current_user.clinic_id
+    ).all()
 
 
-# MEDICAL RECORDS
 # ==================================================
 
 @app.post("/medical-records")
@@ -506,9 +617,11 @@ def add_medical_record(
     symptoms: str,
     treatment: str,
     record_date: str,
-    clinic_id: int | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    require_role(current_user, ["Admin"])
+
     record = MedicalRecord(
         patient_id=patient_id,
         doctor_id=doctor_id,
@@ -516,7 +629,7 @@ def add_medical_record(
         symptoms=symptoms,
         treatment=treatment,
         record_date=record_date,
-        clinic_id=clinic_id
+        clinic_id=current_user.clinic_id
     )
 
     db.add(record)
@@ -530,11 +643,79 @@ def add_medical_record(
 
 
 @app.get("/medical-records")
-def get_medical_records(clinic_id: int | None = None, db: Session = Depends(get_db)):
-    query = db.query(MedicalRecord)
-    if clinic_id is not None:
-        query = query.filter(MedicalRecord.clinic_id == clinic_id)
-    return query.all()
+def get_medical_records(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(MedicalRecord).filter(
+        MedicalRecord.clinic_id == current_user.clinic_id
+    ).all()
+
+
+@app.put("/medical-records/{record_id}")
+def update_medical_record(
+    record_id: int,
+    data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    record = db.query(MedicalRecord).filter(
+        MedicalRecord.id == record_id,
+        MedicalRecord.clinic_id == current_user.clinic_id
+    ).first()
+
+    if record is None:
+        raise HTTPException(status_code=404, detail="Medical record not found")
+
+    allowed_fields = [
+        "patient_id", "doctor_id", "diagnosis",
+        "symptoms", "treatment", "record_date"
+    ]
+
+    for field in allowed_fields:
+        if field in data:
+            setattr(record, field, data[field])
+
+    db.commit()
+    db.refresh(record)
+
+    return {
+        "message": "Medical record updated successfully!",
+        "record": {
+            "id": record.id,
+            "patient_id": record.patient_id,
+            "doctor_id": record.doctor_id,
+            "diagnosis": record.diagnosis,
+            "symptoms": record.symptoms,
+            "treatment": record.treatment,
+            "record_date": record.record_date,
+            "clinic_id": record.clinic_id
+        }
+    }
+
+
+@app.delete("/medical-records/{record_id}")
+def delete_medical_record(
+    record_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    record = db.query(MedicalRecord).filter(
+        MedicalRecord.id == record_id,
+        MedicalRecord.clinic_id == current_user.clinic_id
+    ).first()
+
+    if record is None:
+        raise HTTPException(status_code=404, detail="Medical record not found")
+
+    db.delete(record)
+    db.commit()
+
+    return {"message": "Medical record deleted successfully!"}
 
 
 # ==================================================
@@ -544,112 +725,59 @@ def get_medical_records(clinic_id: int | None = None, db: Session = Depends(get_
 @app.get("/chatbot")
 def chatbot(
     message: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
     user_message = message.lower().strip()
+    clinic_id = current_user.clinic_id
 
-    # Greeting
-    if "hello" in user_message or "hi" in user_message:
-        reply = (
-            "Hello! 👋 Welcome to Smart Hospital. "
-            "How can I help you?"
-        )
+    if "hello" in user_message or user_message == "hi":
+        reply = "Hello! Welcome to Smart Hospital. How can I help you?"
 
-    # Hospital
     elif "hospital" in user_message:
-        reply = (
-            "🏥 Welcome to Smart Hospital Management System. "
-            "I can help you with doctors, patients, appointments, "
-            "prescriptions, departments and medical records."
-        )
+        reply = "Welcome to Smart Hospital Management System. I can help with doctors, patients, appointments, prescriptions, departments and medical records."
 
-    # Doctors
     elif "doctor" in user_message:
-        total_doctors = db.query(Doctor).count()
+        total = db.query(Doctor).filter(Doctor.clinic_id == clinic_id).count()
+        reply = f"There are currently {total} doctors in your clinic."
 
-        reply = (
-            f"👨‍⚕️ There are currently "
-            f"{total_doctors} doctors registered in the hospital."
-        )
-
-    # Patients
     elif "patient" in user_message:
-        total_patients = db.query(Patient).count()
+        total = db.query(Patient).filter(Patient.clinic_id == clinic_id).count()
+        reply = f"There are currently {total} patients in your clinic."
 
-        reply = (
-            f"👤 There are currently "
-            f"{total_patients} patients registered in the system."
-        )
-
-    # Appointments
     elif "appointment" in user_message:
-        total_appointments = db.query(Appointment).count()
+        total = db.query(Appointment).filter(Appointment.clinic_id == clinic_id).count()
+        reply = f"There are currently {total} appointments in your clinic."
 
-        reply = (
-            f"📅 There are currently "
-            f"{total_appointments} appointments in the system."
-        )
+    elif "prescription" in user_message or "medicine" in user_message:
+        total = db.query(Prescription).filter(Prescription.clinic_id == clinic_id).count()
+        reply = f"There are currently {total} prescriptions in your clinic."
 
-    # Prescriptions
-    elif (
-        "prescription" in user_message
-        or "medicine" in user_message
-    ):
-        total_prescriptions = db.query(Prescription).count()
+    elif "clinic" in user_message:
+        clinic = db.query(Clinic).filter(Clinic.id == clinic_id).first()
+        if clinic:
+            reply = f"Your clinic is {clinic.name}."
+        else:
+            reply = "Your clinic could not be found."
 
-        reply = (
-            f"💊 There are currently "
-            f"{total_prescriptions} prescriptions in the system."
-        )
-
-    # Departments
     elif "department" in user_message:
-        total_departments = db.query(Department).count()
+        total = db.query(Department).filter(Department.clinic_id == clinic_id).count()
+        reply = f"Your clinic currently has {total} departments."
 
-        reply = (
-            f"🏢 The hospital currently has "
-            f"{total_departments} departments."
-        )
+    elif "record" in user_message or "medical history" in user_message:
+        total = db.query(MedicalRecord).filter(MedicalRecord.clinic_id == clinic_id).count()
+        reply = f"There are currently {total} medical records in your clinic."
 
-    # Medical Records
-    elif (
-        "record" in user_message
-        or "medical history" in user_message
-    ):
-        total_records = db.query(MedicalRecord).count()
-
-        reply = (
-            f"📋 There are currently "
-            f"{total_records} medical records in the system."
-        )
-
-    # Thanks
     elif "thank" in user_message:
-        reply = (
-            "You're welcome! 😊 "
-            "I'm always here to help."
-        )
+        reply = "You're welcome! I'm always here to help."
 
-    # Goodbye
     elif "bye" in user_message:
-        reply = (
-            "Goodbye! 👋 Have a healthy day."
-        )
+        reply = "Goodbye! Have a healthy day."
 
-    # Unknown question
     else:
-        reply = (
-            "🤖 I'm sorry, I didn't understand that. "
-            "You can ask me about doctors, patients, "
-            "appointments, prescriptions, departments "
-            "or medical records."
-        )
+        reply = "I'm sorry, I didn't understand. You can ask about doctors, patients, appointments, prescriptions, departments or medical records."
 
-    return {
-        "reply": reply
-    }
-
+    return {"reply": reply}
 # ==================================================
 # CLINIC APIs
 # ==================================================
@@ -665,24 +793,67 @@ class ClinicCreate(BaseModel):
 
 
 @app.post("/clinics")
-def create_clinic(clinic_data: ClinicCreate, db: Session = Depends(get_db)):
-    clinic = Clinic(
-        name=clinic_data.name,
-        address=clinic_data.address,
-        phone=clinic_data.phone
+def create_clinic(
+    clinic_data: ClinicCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    # Signup already creates a clinic for each new Admin.
+    # Do not create extra clinics through this endpoint.
+    raise HTTPException(
+        status_code=403,
+        detail="Clinic signup ke zariye create karein"
     )
-    db.add(clinic)
-    db.commit()
-    db.refresh(clinic)
-    return {
-        "message": "Clinic created successfully",
-        "id": clinic.id,
-        "name": clinic.name,
-        "address": clinic.address,
-        "phone": clinic.phone
-    }
 
 
 @app.get("/clinics")
-def get_clinics(db: Session = Depends(get_db)):
-    return db.query(Clinic).all()
+def get_clinics(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(Clinic).filter(
+        Clinic.id == current_user.clinic_id
+    ).all()
+
+
+@app.put("/clinics/{clinic_id}")
+def update_clinic(
+    clinic_id: int,
+    data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    clinic = db.query(Clinic).filter(
+        Clinic.id == clinic_id,
+        Clinic.id == current_user.clinic_id
+    ).first()
+
+    if clinic is None:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+
+    for field in ["name", "address", "phone"]:
+        if field in data:
+            setattr(clinic, field, data[field])
+
+    db.commit()
+    db.refresh(clinic)
+    return {"message": "Clinic updated successfully!"}
+
+
+@app.delete("/clinics/{clinic_id}")
+def delete_clinic(
+    clinic_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    require_role(current_user, ["Admin"])
+
+    # Prevent accidental deletion of a clinic and its related data.
+    raise HTTPException(
+        status_code=403,
+        detail="Clinic deletion is disabled to protect hospital data"
+    )
